@@ -73,7 +73,7 @@ int activate_fetch_record(lockdownd_client_t client, plist_t* record, char* cust
 
 	char* activation_info;
 
-	activate_info* ainfo;
+	activate_info ainfo = { 0, };
 
 	char* device_class = NULL;
 	device_class=(char*)lockdownd_get_string_value(client, "DeviceClass");
@@ -83,55 +83,55 @@ int activate_fetch_record(lockdownd_client_t client, plist_t* record, char* cust
 		{
 			if (cust_iccid==NULL)
 			{
-				ainfo->iccid=(char*)lockdownd_get_string_value(client, "IntegratedCircuitCardIdentity");
+				ainfo.iccid=(char*)lockdownd_get_string_value(client, "IntegratedCircuitCardIdentity");
 			}
 			else {
 				info("ICCID specified on the command line...");
-				ainfo->iccid=cust_iccid;
+				ainfo.iccid=cust_iccid;
 			}
 
 			if (cust_imei==NULL)
 			{
-				ainfo->imei=(char*)lockdownd_get_string_value(client, "InternationalMobileEquipmentIdentity");
+				ainfo.imei=(char*)lockdownd_get_string_value(client, "InternationalMobileEquipmentIdentity");
 			}
 			else {
 				info("IMEI specified on the command line...");
-				ainfo->imei=cust_imei;
+				ainfo.imei=cust_imei;
 			}
 
 			if (cust_imsi==NULL)
 			{
-				ainfo->imsi=(char*)lockdownd_get_string_value(client, "InternationalMobileSubscriberIdentity");
+				ainfo.imsi=(char*)lockdownd_get_string_value(client, "InternationalMobileSubscriberIdentity");
 			}
 			else {
 				info("IMSI specified on the command line...");
-				ainfo->imsi=cust_imsi;
+				ainfo.imsi=cust_imsi;
 			}
 		}
 
 		else {
 			if (cust_iccid==NULL)
 			{
-				ainfo->iccid=get_from_cache("ICCID");
+				ainfo.iccid=get_from_cache("ICCID");
 			}
 			else {
-				ainfo->iccid=cust_iccid;
+				ainfo.iccid=cust_iccid;
 			}
 
 			if (cust_imei==NULL)
 			{
-				ainfo->imei=get_from_cache("IMEI");
+				ainfo.imei=get_from_cache("IMEI");
 			}
 			else {
-				ainfo->imei=cust_imei;
+				ainfo.imei=cust_imei;
 			}
 
 			if (cust_imsi==NULL)
 			{
-				ainfo->imsi=get_from_cache("IMSI");
+				ainfo.imsi=get_from_cache("IMSI");
 			}
 			else {
-				ainfo->imsi=cust_imsi;
+				ainfo.imsi=cust_imsi;
 			}
 		}
 	}
@@ -140,19 +140,18 @@ int activate_fetch_record(lockdownd_client_t client, plist_t* record, char* cust
 	{
 		if (use_cache!=1)
 		{
-			ainfo->serial_number=(char*)lockdownd_get_string_value(client, "SerialNumber");
+			ainfo.serial_number=(char*)lockdownd_get_string_value(client, "SerialNumber");
 		}
 		else {
-			ainfo->serial_number=get_from_cache("SerialNumber");
+			ainfo.serial_number=get_from_cache("SerialNumber");
 		}
 	}
 	else {
 		info("Serial number specified on the command line...");
-		ainfo->serial_number=cust_serial_num;
+		ainfo.serial_number=cust_serial_num;
 	}
 
 	lockdownd_get_value(client, NULL, "ActivationInfo", &activation_info_node);
-	int type = plist_get_node_type(activation_info_node);
 	if (!activation_info_node || plist_get_node_type(activation_info_node) != PLIST_DICT) {
 		error("Unable to get ActivationInfo from lockdownd");
 		return -1;
@@ -194,37 +193,37 @@ int activate_fetch_record(lockdownd_client_t client, plist_t* record, char* cust
 
 	curl_formadd(&post, &last, CURLFORM_COPYNAME, "machineName", CURLFORM_COPYCONTENTS, "linux", CURLFORM_END);
 	curl_formadd(&post, &last, CURLFORM_COPYNAME, "InStoreActivation", CURLFORM_COPYCONTENTS, "false", CURLFORM_END);
-	if (ainfo->imei != NULL) {
-		curl_formadd(&post, &last, CURLFORM_COPYNAME, "IMEI", CURLFORM_COPYCONTENTS, ainfo->imei, CURLFORM_END);
-		cache("IMEI", (const char *)ainfo->imei);
+	if (ainfo.imei != NULL) {
+		curl_formadd(&post, &last, CURLFORM_COPYNAME, "IMEI", CURLFORM_COPYCONTENTS, ainfo.imei, CURLFORM_END);
+		cache("IMEI", (const char *)ainfo.imei);
 		//free(ainfo->imei);
 	}
 	else {
 		cache("IMEI", "");
 	}
 
-	if (ainfo->imsi != NULL) {
-		curl_formadd(&post, &last, CURLFORM_COPYNAME, "IMSI", CURLFORM_COPYCONTENTS, ainfo->imsi, CURLFORM_END);
-		cache("IMSI", (const char *)ainfo->imsi);
+	if (ainfo.imsi != NULL) {
+		curl_formadd(&post, &last, CURLFORM_COPYNAME, "IMSI", CURLFORM_COPYCONTENTS, ainfo.imsi, CURLFORM_END);
+		cache("IMSI", (const char *)ainfo.imsi);
 		//free(ainfo->imsi);
 	}
 	else {
 		cache("IMSI", "");
 	}
 
-	if (ainfo->iccid != NULL) {
-		curl_formadd(&post, &last, CURLFORM_COPYNAME, "ICCID", CURLFORM_COPYCONTENTS, ainfo->iccid, CURLFORM_END);
-		cache("ICCID", (const char *)ainfo->iccid);
+	if (ainfo.iccid != NULL) {
+		curl_formadd(&post, &last, CURLFORM_COPYNAME, "ICCID", CURLFORM_COPYCONTENTS, ainfo.iccid, CURLFORM_END);
+		cache("ICCID", (const char *)ainfo.iccid);
 		//free(ainfo->iccid);
 	}
 	else {
 		cache("ICCID", "");
 	}
 
-	if (ainfo->serial_number != NULL) {
-		curl_formadd(&post, &last, CURLFORM_COPYNAME, "AppleSerialNumber", CURLFORM_COPYCONTENTS, ainfo->serial_number, CURLFORM_END);
-		cache("SerialNumber", (const char *)ainfo->serial_number);
-		free(ainfo->serial_number);
+	if (ainfo.serial_number != NULL) {
+		curl_formadd(&post, &last, CURLFORM_COPYNAME, "AppleSerialNumber", CURLFORM_COPYCONTENTS, ainfo.serial_number, CURLFORM_END);
+		cache("SerialNumber", (const char *)ainfo.serial_number);
+		free(ainfo.serial_number);
 	}
 	else {
 		cache("SeralNumber", "");
