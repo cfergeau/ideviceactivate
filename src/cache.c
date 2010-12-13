@@ -119,7 +119,7 @@ char* get_from_cache(const char *what)
 	char d[BUFSIZE];
 	read_file((const char *)fname, d);
 
-	return (char *)d;
+	return strdup(d);
 }
 
 /* Just prints a little notice about what caching actually does... */
