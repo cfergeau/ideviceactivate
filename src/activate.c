@@ -320,7 +320,7 @@ int do_activation(lockdownd_client_t client, plist_t activation_record)
 
 	// Just my little dump'n'run exercise with the activation record...
 	uint32_t len=0;
-	char **xml=NULL;
+	char *xml=NULL;
 
 	plist_to_xml(activation_record, &xml, &len);
 	printf("ACTIVATION RECORD:\n\n%s\n\n", xml);

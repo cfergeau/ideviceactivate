@@ -99,7 +99,7 @@ int cache_plist(const char *fname, plist_t plist)
 	if (backup_to_cache==1)
 	{
 		uint32_t len=0;
-		char **xml=NULL;
+		char *xml=NULL;
 
 		plist_to_xml(plist, &xml, &len);
 
@@ -116,8 +116,8 @@ char* get_from_cache(const char *what)
 	char fname[512];
 	snprintf(fname, 512, "%s/%s", cachedir, what);
 
-	char *d[BUFSIZE];
-	read_file((const char *)fname, &d);
+	char d[BUFSIZE];
+	read_file((const char *)fname, d);
 
 	return (char *)d;
 }
